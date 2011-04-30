@@ -20,9 +20,11 @@ class OCD
     if name =~ @@ep_pattern
       match = $~.to_a
       return nil if match.length < 4
-      ep = Hashie::Mash.new
-      ep.show_name, ep.season, ep.episode = match[1], match[2], match[3]
-      return ep
+      return Hashie::Mash.new({
+        :show_name => match[1],
+        :season => match[2].to_i,
+        :episode => match[3].to_i
+      })
     end
   end
 
