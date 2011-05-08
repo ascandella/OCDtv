@@ -2,3 +2,4 @@ directory: /Volumes/tv
 extensions:
   - avi
   - mkv
+log: /var/log/ocdtv.log
