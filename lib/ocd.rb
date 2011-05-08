@@ -5,8 +5,10 @@ class OCD
   end
 
   def scan
+    min_age = Date.today - @config['shelf_life_days']
     Dir.glob(@config['directory'] + "/*.{" +
              @config['extensions'].join(',') + "}") do |f|
+      next if Date.parse(File.ctime(f).strftime('%Y/%m/%d')) > min_age
       basics = File.basename(f)
       episode = extract_episode(basics)
 
@@ -40,12 +42,11 @@ private
     [lambda {|n, s| "#{n}/Season #{s}"},
      lambda {|n, s| "#{n}/#{n} #{s}"},
      lambda {|n, s| "#{n} #{s}"},
-     lambda {|n, s| n}]
-     .each do |finder|
+     lambda {|n, s| n}].each do |finder|
       guess = File.join(path, finder.call(name, season))
-      break Dir.open(guess) if Dir.exists?(guess)
+      break Dir.open(guess) if File.directory?(guess)
       guess.gsub!('.', ' ')
-      break Dir.open(guess) if Dir.exists?(guess)
+      break Dir.open(guess) if File.directory?(guess)
     end
   end
 
@@ -55,7 +56,6 @@ private
   @@ep_pattern = Regexp.compile(/(.*)[\. ][sS]([0-9]{1,2})[eE]([0-9]{1,2}).*/)
 
   def logger
-    # @logger ||= Logger.new(@config[:log)
     @logger ||= Logger.new(STDOUT)
   end
 end

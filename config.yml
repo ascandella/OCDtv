@@ -2,4 +2,5 @@ directory: /home/media/tv
 extensions:
   - avi
   - mkv
+shelf_life_days: 3
 log: /var/log/ocdtv.log
