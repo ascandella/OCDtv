@@ -16,6 +16,8 @@ class OCD
     end
   end
 
+private
+
   def extract_episode(name)
     if name =~ @@ep_pattern
       match = $~.to_a
