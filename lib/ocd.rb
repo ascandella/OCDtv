@@ -1,10 +1,10 @@
 class OCD
-  def initialize(config)
+  def initialize(config, opts={})
     @config = config
-    logger.level = Logger::INFO
+    logger.level = opts[:debug] ? Logger::DEBUG : Logger::INFO
   end
 
-  def scan
+  def scan(dry_run=false)
     min_age = Date.today - @config['shelf_life_days']
     Dir.glob(@config['directory'] + "/*.{" +
              @config['extensions'].join(',') + "}") do |f|
@@ -15,7 +15,14 @@ class OCD
       if episode
         dir = find_name_with_season(
           @config['directory'], episode[:show_name], episode[:season])
-        logger.info("Moving #{f} to #{dir.path}")
+
+        if dir.is_a? Array
+          logger.warn("Could not find path for #{f}. Episode: #{episode.inspect}")
+          next
+        end
+
+        logger.info("#{dry_run ? 'Would move' : 'Moving'} #{f} to #{dir.path}")
+        next if dry_run
         begin
           FileUtils.mv(f, dir.path)
         rescue => ex
@@ -26,7 +33,6 @@ class OCD
   end
 
 private
-
   def extract_episode(name)
     if name =~ @@ep_pattern
       match = $~.to_a
@@ -39,13 +45,17 @@ private
   end
 
   def find_name_with_season(path, name, season)
-    [lambda {|n, s| "#{n}/Season #{s}"},
-     lambda {|n, s| "#{n}/#{n} #{s}"},
-     lambda {|n, s| "#{n} #{s}"},
-     lambda {|n, s| n}].each do |finder|
-      guess = File.join(path, finder.call(name, season))
+    patterns = @config['layout'].map do |pattern|
+      pattern.gsub('%{name}', name).gsub('%{season}', season.to_s)
+    end
+    patterns.each do |subpath|
+      # This would be way nicer as a loop, but we need the ability to 'break'
+      # here in order to stop looking.
+      guess = File.join(path, subpath)
       break Dir.open(guess) if File.directory?(guess)
       guess.gsub!('.', ' ')
+      break Dir.open(guess) if File.directory?(guess)
+      guess.gsub!('The ', '')
       break Dir.open(guess) if File.directory?(guess)
     end
   end

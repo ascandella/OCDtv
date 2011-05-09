@@ -4,3 +4,8 @@ extensions:
   - mkv
 shelf_life_days: 3
 log: /var/log/ocdtv.log
+layout:
+  - %{name}/Season %{season}
+  - %{name}/%{name} %{season}
+  - %{name} %{season}
+  - %{name}

@@ -11,5 +11,4 @@ I run it as a cron job once a day on my media server to keep fresh files in the 
 
 Configuration
 -------------
-
 See 'config.yml'. Mostly just point it at the base directory of your media, and decide how long you want to keep files. Default is 3 days.
