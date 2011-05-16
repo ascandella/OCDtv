@@ -16,7 +16,7 @@ class OCD
         dir = find_name_with_season(
           @config['directory'], episode[:show_name], episode[:season])
 
-        if dir.is_a? Array
+        if dir.nil?
           logger.warn("Could not find path for #{f}. Episode: #{episode.inspect}")
           next
         end
@@ -49,14 +49,13 @@ private
       pattern.gsub('%{name}', name).gsub('%{season}', season.to_s)
     end
     patterns.each do |subpath|
-      # This would be way nicer as a loop, but we need the ability to 'break'
-      # here in order to stop looking.
-      guess = File.join(path, subpath)
-      break Dir.open(guess) if File.directory?(guess)
-      guess.gsub!('.', ' ')
-      break Dir.open(guess) if File.directory?(guess)
-      guess.gsub!('The ', '')
-      break Dir.open(guess) if File.directory?(guess)
+      found, guess = nil, File.join(path, subpath)
+      # cxlt's famous any? trick for short-circuiting
+      @@substitutions.any? do |stripper|
+        guess.gsub!(stripper[0], stripper[1])
+        found = Dir.open(guess) if File.directory?(guess)
+      end
+      break found if found
     end
   end
 
@@ -64,6 +63,8 @@ private
   # Also, for some reason it wouldn't compile insensitive, so
   # I spelled out the cases. Good times.
   @@ep_pattern = Regexp.compile(/(.*)[\. ][sS]([0-9]{1,2})[eE]([0-9]{1,2}).*/)
+
+  @@substitutions = [['', ''], ['.', ' '], ['The ', '']]
 
   def logger
     @logger ||= Logger.new(STDOUT)
