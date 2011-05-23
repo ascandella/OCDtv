@@ -7,7 +7,7 @@ require 'yaml'
 require 'logger'
 require 'trollop'
 
-require './lib/ocd.rb'
+require File.join(File.dirname(__FILE__), 'lib/ocd')
 COMMANDS = %w(scan dryrun)
 
 opts = Trollop::options do
