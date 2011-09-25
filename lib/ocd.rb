@@ -21,6 +21,11 @@ class OCD
           next
         end
 
+        if dir.is_a? Array
+          logger.warn("Found multiple paths for #{f}: #{dir.join(', ')}. Ignoring")
+          next
+        end
+
         logger.info("#{dry_run ? 'Would move' : 'Moving'} #{f} to #{dir.path}")
         next if dry_run
         begin
