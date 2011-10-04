@@ -69,7 +69,7 @@ private
   # I spelled out the cases. Good times.
   @@ep_pattern = Regexp.compile(/(.*)[\. ][sS]([0-9]{1,2})[eE]([0-9]{1,2}).*/)
 
-  @@substitutions = [['', ''], ['.', ' '], ['The ', ''], ['Its', "It's"], [/[0-9]{4}/, '']]
+  @@substitutions = [['', ''], ['.', ' '], ['The ', ''], ['Its', "It's"], [/ *[0-9]{4}/, '']]
 
   def logger
     @logger ||= Logger.new(STDOUT)
