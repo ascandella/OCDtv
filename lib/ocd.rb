@@ -43,17 +43,16 @@ private
       match = $~.to_a
       return {
         :show_name => match[1],
-        :season => match[2].to_i,
-        :episode => match[3].to_i
-      } if match.length > 3
+        :season => match[3].to_i,
+        :episode => match[4].to_i
+      } if match.length > 4
     end
   end
 
   def find_name_with_season(path, name, season)
-    patterns = @config['layout'].map do |pattern|
+    @config['layout'].map do |pattern|
       pattern.gsub('%{name}', name).gsub('%{season}', season.to_s)
-    end
-    patterns.each do |subpath|
+    end.each do |subpath|
       found, guess = nil, File.join(path, subpath)
       # cxlt's famous any? trick for short-circuiting
       @@substitutions.any? do |stripper|
@@ -67,7 +66,7 @@ private
   # I wanted to do this in the least readable way possible.
   # Also, for some reason it wouldn't compile insensitive, so
   # I spelled out the cases. Good times.
-  @@ep_pattern = Regexp.compile(/(.*)[\. ][sS]([0-9]{1,2})[eE]([0-9]{1,2}).*/)
+  @@ep_pattern = Regexp.compile(/(.*)[\. ][sS]?(20[0-9]{1,2}[\. ])?([0-9]{1,2})[eE\. ]([0-9]{1,2}).*/)
 
   @@substitutions = [['', ''], ['.', ' '], ['The ', ''], ['Its', "It's"], [/ *[0-9]{4}/, '']]
 
