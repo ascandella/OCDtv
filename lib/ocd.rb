@@ -37,17 +37,21 @@ class OCD
     end
   end
 
-private
   def extract_episode(name)
-    if name =~ @@ep_pattern
-      match = $~.to_a
-      return {
-        :show_name => match[1],
-        :season => match[3].to_i,
-        :episode => match[4].to_i
-      } if match.length > 4
+    @@all_patterns.each do |pattern|
+      if name =~ pattern
+        match = $~.to_a
+        return {
+          :show_name => match[1],
+          :season => match[3].to_i,
+          :episode => match[4].to_i
+        } if match.length > 4
+      end
     end
+    raise 'no match'
   end
+
+private
 
   def find_name_with_season(path, name, season)
     @config['layout'].map do |pattern|
@@ -66,7 +70,9 @@ private
   # I wanted to do this in the least readable way possible.
   # Also, for some reason it wouldn't compile insensitive, so
   # I spelled out the cases. Good times.
-  @@ep_pattern = Regexp.compile(/(.*)[\. ][sS]?(20[0-9]{1,2}[\. ])?([0-9]{1,2})[eE\. ]([0-9]{1,2}).*/)
+  @@scene_pattern = Regexp.compile(/(.*)[\. ][sS]?(20[0-9]{1,2}[\. ])?([0-9]{1,2})[eE\. ]([0-9]{1,2}).*/)
+  @@tvnamer_pattern = Regexp.compile(/([^0-9\.]*) - [\[](20[0-9]{1,2}-)?([0-9]{1,2})[x-]([0-9]{1,2})[\]] - ([^\.]).*/)
+  @@all_patterns = [@@scene_pattern, @@tvnamer_pattern]
 
   @@substitutions = [['', ''], ['.', ' '], ['The ', ''], ['Its', "It's"], [/ *[0-9]{4}/, '']]
 
