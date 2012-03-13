@@ -74,7 +74,7 @@ private
   @@tvnamer_pattern = Regexp.compile(/([^0-9\.]*) - [\[](20[0-9]{1,2}-)?([0-9]{1,2})[x-]([0-9]{1,2})[\]] - ([^\.]).*/)
   @@all_patterns = [@@scene_pattern, @@tvnamer_pattern]
 
-  @@substitutions = [['', ''], ['.', ' '], ['The ', ''], ['Its', "It's"], [/ *[0-9]{4}/, '']]
+  @@substitutions = [['', ''], ['.', ' '], ['The ', ''], ['&', 'and'], ['Its', "It's"], [/ *[0-9]{4}/, '']]
 
   def logger
     @logger ||= Logger.new(STDOUT)
